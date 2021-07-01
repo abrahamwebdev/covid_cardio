@@ -3,9 +3,7 @@ from app import app
 import urllib.request
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
-from flask_ngrok import run_with_ngrok
 
-run_with_ngrok(app)
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 def allowed_file(filename):
@@ -28,7 +26,7 @@ def upload_image():
 		filename = secure_filename(file.filename)
 		file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 		path = os.path.join(app.config['UPLOAD_FOLDER'],filename)
-		# print(path)
+		print(path)
 		#print('upload_image filename: ' + filename)
 		import numpy as np
 		import pandas as pd
@@ -37,6 +35,7 @@ def upload_image():
 		import keras
 		import time
 		import keras.backend as K
+		import os
 		import shutil
 		import random
 
@@ -76,7 +75,7 @@ def upload_image():
 		model_j = tf.keras.models.model_from_json(json_savedModel)
 		import numpy as np
 		from keras.preprocessing import image
-		test_image = image.load_img(path, target_size = (100, 100))
+		test_image = image.load_img('/content/sample_data/cardio1.png', target_size = (100, 100))
 		test_image = image.img_to_array(test_image)
 		test_image = np.expand_dims(test_image, axis = 0)
 		result = model.predict(test_image)
@@ -86,7 +85,7 @@ def upload_image():
 			else:
 				flash("No signs of Covid effects or Viral Pneumonia")
 		else:
-			flash("Chances of Viral Pneumonia is highest")
+			print("Chances of Viral Pneumonia is highest")
 		# flash('Image successfully uploaded and displayed below')
 		return render_template('upload.html', filename=filename)
 
@@ -100,4 +99,4 @@ def display_image(filename):
 	return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
